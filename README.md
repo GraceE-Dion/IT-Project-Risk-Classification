@@ -80,9 +80,13 @@ IT-Project-Risk-Classification/
 
 ### Session 1 - Synthetic Baseline
 **Source:** Kaggle - Project Management Risk Raw (ka66ledata)
+
 **File:** `project_risk_raw_dataset.csv`
+
 **Rows:** 4,000 | **Features:** 49 | **Classes:** 4 (Critical / High / Medium / Low)
+
 **License:** Community Data License Agreement
+
 **Note:** AI-generated dataset. The description stated "50 simulated data points", a discrepancy resolved by direct inspection confirming 4,000 rows. Used for baseline methodology demonstration only. **Not suitable for real-world inference.**
 
 **Feature Categories:**
