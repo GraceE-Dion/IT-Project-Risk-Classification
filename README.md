@@ -3,7 +3,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-In%20Development-orange)]()
+[![Status](https://img.shields.io/badge/Status-Complete-brightgreen)]()
 
 ---
 
@@ -35,11 +35,8 @@ it-project-risk-classification/
 │   └── processed/            # Cleaned, feature-engineered datasets
 │
 ├── notebooks/
-│   ├── 01_eda.ipynb          # Exploratory Data Analysis
-│   ├── 02_preprocessing.ipynb
-│   ├── 03_baseline_models.ipynb
-│   ├── 04_tuning_and_regularization.ipynb
-│   └── 05_final_evaluation.ipynb
+│   ├── 01_synthetic_baseline.ipynb     # Session 1 — Synthetic dataset pipeline
+│   └── 02_nasa_mdp_real_data.ipynb     # Session 2 — NASA Raw MDP pipeline
 │
 ├── src/
 │   ├── preprocess.py         # Data cleaning and feature engineering
@@ -58,21 +55,18 @@ it-project-risk-classification/
 
 ---
 
-## Dataset
+## Datasets
 
-**Primary Source:** Kaggle / PROMISE Repository  
-**Target Variable:** Project outcome — Risk Level (High / Medium / Low) or Success / Failure  
-**Key Feature Categories:**
+### Session 1 — Synthetic Baseline
+**Source:** Kaggle — Project Management Risk Raw (ka66ledata)  
+**Rows:** 4,000 | **Features:** 49 | **Target:** Risk Level (Critical / High / Medium / Low)  
+**Note:** AI-generated dataset. Used for baseline methodology demonstration only. Not suitable for real-world inference.
 
-| Category | Example Features |
-|---|---|
-| Governance | Compliance score, audit frequency, policy adherence rate |
-| Human Factors | Team size, turnover rate, stakeholder engagement score |
-| Project Parameters | Duration, budget variance, scope change count |
-| Cybersecurity | Security controls implemented, incident count, vulnerability exposure |
-| Delivery | Sprint velocity, milestone slippage, defect rate |
-
-> Dataset citation and license details added upon download.
+### Session 2 — NASA Raw MDP Data
+**Source:** NASA Metrics Data Program (MDP) via [NASADefectDataset](https://github.com/klainfo/NASADefectDataset/tree/master/OriginalData/MDP) — JM1.arff  
+**Rows:** 10,878 | **Features:** 21 | **Target:** Defect Label (Clean / Defective)  
+**License:** Public domain — peer-reviewed, widely cited in software engineering research  
+**Key Features:** LOC, Cyclomatic Complexity, Halstead Metrics, Branch Count, Module Dependencies
 
 ---
 
@@ -131,20 +125,53 @@ Primary metrics (in order of priority for imbalanced risk data):
 
 ## Results
 
-> To be populated after training runs.
+### Dataset Comparison
 
-| Model | F1 (macro) | Recall | ROC-AUC | Overfit Gap |
-|---|---|---|---|---|
-| Logistic Regression | - | - | - | - |
-| Random Forest | - | - | - | - |
-| XGBoost | - | - | - | - |
-| MLP | - | - | - | - |
+| | Synthetic Dataset | NASA Raw MDP |
+|---|---|---|
+| CV F1 (macro) | 0.5700 | **0.7439** |
+| CV Std | 0.0165 | **0.0074** |
+| Rows | 4,000 | 10,878 |
+| Data Quality | Simulated | Real NASA ✅ |
+| Inference Ready | ❌ | ✅ |
+| Improvement | baseline | **+30.5% F1, 2.2x more stable** |
+
+### Session 1 — Synthetic Dataset
+
+| Model | Val F1 (macro) | Overfit Gap | Status |
+|---|---|---|---|
+| Logistic Regression | 0.5890 | 0.0079 | ✅ Selected |
+| Random Forest | 0.5590 | 0.3775 | ❌ Overfit |
+| XGBoost | 0.5920 | 0.0805 | ❌ |
+| XGBoost 5-Fold CV | 0.5700 ± 0.0165 | — | ✅ |
+
+**Final Test F1 (Logistic Regression):** 0.5872 | **Accuracy:** 0.58
+
+### Session 2 — NASA Raw MDP Data
+
+| Model | Val F1 (macro) | Overfit Gap | Status |
+|---|---|---|---|
+| Logistic Regression | 0.6232 | 0.0440 | ✅ Clean |
+| Random Forest | 0.6492 | 0.1402 | ❌ Overfit |
+| XGBoost 5-Fold CV | 0.7439 ± 0.0074 | — | ✅ Selected |
+
+**Final Test F1 (XGBoost):** 0.6082 | **Accuracy:** 0.70
 
 ---
 
 ## Key Findings
 
-> To be populated after analysis.
+1. **Data quality critically impacts model performance** — Real NASA MDP data produced 30.5% better F1 and 2.2x more stable cross-validation results than the synthetic dataset.
+
+2. **Synthetic data is not suitable for real-world inference** — Models trained on AI-generated project data fail to capture real organizational complexity, governance gaps, and human-factor interdependencies.
+
+3. **Logistic Regression is a competitive baseline** — On the synthetic dataset, Logistic Regression (F1: 0.5890, gap: 0.0079) outperformed Random Forest and XGBoost in generalization, suggesting largely linear feature-target relationships in synthetic data.
+
+4. **XGBoost generalizes best on real data** — On NASA MDP data, XGBoost achieved a 5-fold CV F1 of 0.7439 with low variance (std: 0.0074), demonstrating strong and stable generalization on authentic software project metrics.
+
+5. **Class imbalance requires explicit handling** — The 80/20 clean/defective split in NASA data required SMOTE augmentation to prevent model bias toward the majority class.
+
+6. **Future work** requires datasets with explicit governance, human-factor, and cybersecurity compliance features aligned with NIST SP 800-37 and CMMC frameworks for direct IT project risk classification.
 
 ---
 
@@ -184,17 +211,18 @@ pip install -r requirements.txt
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/GraceE-Dion/it-project-risk-classification.git
-cd it-project-risk-classification
+git clone https://github.com/GraceE-Dion/IT-Project-Risk-Classification.git
+cd IT-Project-Risk-Classification
 
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Place raw dataset in data/raw/
-
-# 4. Run notebooks in order
-jupyter notebook notebooks/01_eda.ipynb
+# 3. Run notebooks in order
+jupyter notebook notebooks/01_synthetic_baseline.ipynb
+jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 ```
+
+> Notebooks were developed and executed on Kaggle (free CPU). No GPU required.
 
 ---
 
@@ -218,5 +246,5 @@ If you reference this work:
 ```
 Egbedion, G. (2025). IT Project Risk Classification: A Machine Learning Framework 
 for Cybersecurity Governance and Human-Factor Risk Analytics. GitHub Repository.
-https://github.com/GraceE-Dion/it-project-risk-classification
+https://github.com/GraceE-Dion/IT-Project-Risk-Classification
 ```
