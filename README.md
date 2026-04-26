@@ -241,6 +241,29 @@ This project applies a strict **generalization discipline** from day one, inform
 
 **Key observation:** The Defective class F1 (0.42) is lower than Clean (0.80), reflecting the inherent difficulty of minority class prediction even after SMOTE. In a real deployment context, the 92 missed defective modules (false negatives) represent the higher-risk failure mode, undetected defects reaching production, and warrant further work on recall optimization.
 
+
+---
+
+## Visual Results
+
+### Session 1 — Synthetic Dataset (Logistic Regression)
+<p align="center">
+  <img src="images/classification_report_session1.jpg" width="70%" />
+</p>
+<p align="center">
+  <img src="images/confusion_matrix_session1.jpg" width="60%" />
+</p>
+
+<hr>
+
+### Session 2 — NASA Raw MDP (XGBoost)
+<p align="center">
+  <img src="images/classification_report_session2.jpg" width="70%" />
+</p>
+<p align="center">
+  <img src="images/confusion_matrix_session2.jpg" width="60%" />
+</p>
+
 ---
 
 ## Key Findings
