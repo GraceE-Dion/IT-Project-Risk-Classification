@@ -9,7 +9,7 @@
 
 ## Overview
 
-This project develops a supervised machine learning pipeline to classify IT project risk outcomes using governance, human-factor, and cybersecurity compliance features. The work sits at the intersection of **IT project management**, **cybersecurity governance**, and **data-driven risk analytics** — contributing to the broader research agenda of improving project delivery outcomes through predictive human-factor modeling.
+This project develops a supervised machine learning pipeline to classify IT project risk outcomes using governance, human-factor, and cybersecurity compliance features. The work sits at the intersection of **IT project management**, **cybersecurity governance**, and **data-driven risk analytics**, contributing to the broader research agenda of improving project delivery outcomes through predictive human-factor modeling.
 
 This project is part of a research portfolio supporting work on the SECURE-EXEC™ framework for cybersecurity execution and governance.
 
@@ -17,7 +17,7 @@ This project is part of a research portfolio supporting work on the SECURE-EXEC�
 
 ## Research Motivation
 
-IT project failures remain disproportionately tied to human-factor risks — governance gaps, compliance drift, team dynamics, and stakeholder misalignment — rather than purely technical failures. Existing risk models underweight these dimensions. This project builds a classification model that:
+IT project failures remain disproportionately tied to human-factor risks which includes governance gaps, compliance drift, team dynamics, and stakeholder misalignment, rather than purely technical failures. Existing risk models underweight these dimensions. This project builds a classification model that:
 
 - Identifies early-stage risk signals in IT projects
 - Surfaces human-factor and governance features as predictive variables
@@ -35,8 +35,8 @@ it-project-risk-classification/
 │   └── processed/            # Cleaned, feature-engineered datasets
 │
 ├── notebooks/
-│   ├── 01_synthetic_baseline.ipynb     # Session 1 — Synthetic dataset pipeline
-│   └── 02_nasa_mdp_real_data.ipynb     # Session 2 — NASA Raw MDP pipeline
+│   ├── 01_synthetic_baseline.ipynb     # Session 1 - Synthetic dataset pipeline
+│   └── 02_nasa_mdp_real_data.ipynb     # Session 2 - NASA Raw MDP pipeline
 │
 ├── src/
 │   ├── preprocess.py         # Data cleaning and feature engineering
@@ -57,15 +57,15 @@ it-project-risk-classification/
 
 ## Datasets
 
-### Session 1 — Synthetic Baseline
-**Source:** Kaggle — Project Management Risk Raw (ka66ledata)  
+### Session 1 - Synthetic Baseline
+**Source:** Kaggle - Project Management Risk Raw (ka66ledata)  
 **Rows:** 4,000 | **Features:** 49 | **Target:** Risk Level (Critical / High / Medium / Low)  
 **Note:** AI-generated dataset. Used for baseline methodology demonstration only. Not suitable for real-world inference.
 
 ### Session 2 — NASA Raw MDP Data
 **Source:** NASA Metrics Data Program (MDP) via [NASADefectDataset](https://github.com/klainfo/NASADefectDataset/tree/master/OriginalData/MDP) — JM1.arff  
 **Rows:** 10,878 | **Features:** 21 | **Target:** Defect Label (Clean / Defective)  
-**License:** Public domain — peer-reviewed, widely cited in software engineering research  
+**License:** Public domain - peer-reviewed, widely cited in software engineering research  
 **Key Features:** LOC, Cyclomatic Complexity, Halstead Metrics, Branch Count, Module Dependencies
 
 ---
@@ -82,7 +82,7 @@ it-project-risk-classification/
 - Null imputation strategy (median for numeric, mode for categorical)
 - Label encoding / one-hot encoding
 - Feature scaling (StandardScaler for linear models)
-- Class imbalance handling — **SMOTE** if needed
+- Class imbalance handling - **SMOTE** if needed
 
 ### 3. Models Evaluated
 | Model | Rationale |
@@ -99,12 +99,12 @@ This project applies a strict **generalization discipline** from day one:
 
 | Control | Implementation |
 |---|---|
-| Data split | 80% train / 10% validation / 10% test — test set locked until final evaluation |
+| Data split | 80% train / 10% validation / 10% test - test set locked until final evaluation |
 | Cross-validation | 5-fold stratified CV on training set |
 | Early stopping | Patience = 10 epochs on validation loss (for MLP) |
 | Regularization | L2 / weight decay; Dropout (0.3–0.5) for neural network |
 | Tree depth control | `max_depth`, `min_samples_leaf` for ensemble models |
-| Learning curves | Plotted every run — training vs. validation accuracy/loss |
+| Learning curves | Plotted every run - training vs. validation accuracy/loss |
 | Generalization threshold | Validation accuracy must be within 3–5% of training accuracy |
 
 **Diagnosis flags monitored:**
@@ -115,11 +115,11 @@ This project applies a strict **generalization discipline** from day one:
 ### 5. Evaluation Metrics
 
 Primary metrics (in order of priority for imbalanced risk data):
-1. **F1 Score (macro)** — balances precision and recall across classes
-2. **Recall** — critical for catching high-risk projects (false negatives are costly)
-3. **ROC-AUC** — overall discriminative power
-4. **Precision** — reduces false alarms
-5. **Accuracy** — reported but not primary for imbalanced classes
+1. **F1 Score (macro)** - balances precision and recall across classes
+2. **Recall** - critical for catching high-risk projects (false negatives are costly)
+3. **ROC-AUC** - overall discriminative power
+4. **Precision** - reduces false alarms
+5. **Accuracy** - reported but not primary for imbalanced classes
 
 ---
 
@@ -136,7 +136,7 @@ Primary metrics (in order of priority for imbalanced risk data):
 | Inference Ready | ❌ | ✅ |
 | Improvement | baseline | **+30.5% F1, 2.2x more stable** |
 
-### Session 1 — Synthetic Dataset
+### Session 1 - Synthetic Dataset
 
 | Model | Val F1 (macro) | Overfit Gap | Status |
 |---|---|---|---|
@@ -179,10 +179,10 @@ Primary metrics (in order of priority for imbalanced risk data):
 
 This project's feature taxonomy is designed to map to established cybersecurity and project governance frameworks:
 
-- **NIST SP 800-37** — Risk Management Framework
-- **CMMC Level 2/3** — Human-factor access and control compliance indicators
-- **ISO 27001** — Information security risk treatment features
-- **PMI PMBOK** — Project performance domain variables
+- **NIST SP 800-37** - Risk Management Framework
+- **CMMC Level 2/3** - Human-factor access and control compliance indicators
+- **ISO 27001** - Information security risk treatment features
+- **PMI PMBOK** - Project performance domain variables
 
 ---
 
@@ -230,7 +230,7 @@ jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 
 **Grace Egbedion**  
 Technical Program Manager | Cybersecurity Governance Specialist | PhD Candidate, Computational & Data Science  
-[GitHub](https://github.com/GraceE-Dion) | [LinkedIn](#)
+[GitHub](https://github.com/GraceE-Dion) | [LinkedIn](https://www.linkedin.com/in/grace-egbedion/)
 
 ---
 
