@@ -101,8 +101,11 @@ IT-Project-Risk-Classification/
 
 ### Session 2 - NASA Raw MDP Data
 **Source:** NASA Metrics Data Program (MDP) via [NASADefectDataset](https://github.com/klainfo/NASADefectDataset/tree/master/OriginalData/MDP)
+
 **File:** `JM1.arff` - loaded directly via `urllib` and parsed with `scipy.io.arff`
+
 **Rows:** 10,878 | **Features:** 21 | **Target:** Defect Label (Clean / Defective)
+
 **License:** Public domain - peer-reviewed, widely cited in software engineering research
 
 **Feature Categories:**
