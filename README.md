@@ -246,7 +246,7 @@ This project applies a strict **generalization discipline** from day one, inform
 
 ## Visual Results
 
-### Session 1 — Synthetic Dataset (Logistic Regression)
+### Session 1 - Synthetic Dataset (Logistic Regression)
 <p align="center">
   <img src="images/classification_report_session1.jpg" width="70%" />
 </p>
@@ -256,7 +256,7 @@ This project applies a strict **generalization discipline** from day one, inform
 
 <hr>
 
-### Session 2 — NASA Raw MDP (XGBoost)
+### Session 2 - NASA Raw MDP (XGBoost)
 <p align="center">
   <img src="images/classification_report_session2.jpg" width="70%" />
 </p>
