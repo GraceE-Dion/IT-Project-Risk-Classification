@@ -62,8 +62,8 @@ it-project-risk-classification/
 **Rows:** 4,000 | **Features:** 49 | **Target:** Risk Level (Critical / High / Medium / Low)  
 **Note:** AI-generated dataset. Used for baseline methodology demonstration only. Not suitable for real-world inference.
 
-### Session 2 — NASA Raw MDP Data
-**Source:** NASA Metrics Data Program (MDP) via [NASADefectDataset](https://github.com/klainfo/NASADefectDataset/tree/master/OriginalData/MDP) — JM1.arff  
+### Session 2 - NASA Raw MDP Data
+**Source:** NASA Metrics Data Program (MDP) via [NASADefectDataset](https://github.com/klainfo/NASADefectDataset/tree/master/OriginalData/MDP) - JM1.arff  
 **Rows:** 10,878 | **Features:** 21 | **Target:** Defect Label (Clean / Defective)  
 **License:** Public domain - peer-reviewed, widely cited in software engineering research  
 **Key Features:** LOC, Cyclomatic Complexity, Halstead Metrics, Branch Count, Module Dependencies
