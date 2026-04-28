@@ -47,7 +47,7 @@ IT-Project-Risk-Classification/
 ├── outputs/
 │   ├── confusion_matrix_session1.png       # Session 1 confusion matrix
 │   ├── confusion_matrix_session2.png       # Session 2 confusion matrix
-│   └── dataset_comparison.png             # Synthetic vs NASA MDP comparison chart
+│   └── dataset_comparison.png              # Synthetic vs NASA MDP comparison chart
 │
 ├── 01_setup_environment.py                 # Installs dependencies, verifies environment
 ├── 02_data_acquisition.py                  # Downloads synthetic (Kaggle) and NASA MDP (GitHub)
@@ -64,8 +64,8 @@ IT-Project-Risk-Classification/
 ├── 13_session2_xgboost.py                  # XGBoost tuning - 3 configs with regularization
 ├── 14_session2_cross_validation.py         # 5-fold CV on NASA MDP - 0.7439 F1 (selected)
 ├── 15_session2_final_evaluation.py         # XGBoost final test - 0.6082 F1, 0.70 accuracy
-├── 16_dataset_comparison.py               # Side-by-side comparison with chart output
-├── master_training_script.py              # Full end-to-end pipeline in one execution
+├── 16_dataset_comparison.py                # Side-by-side comparison with chart output
+├── master_training_script.py               # Full end-to-end pipeline in one execution
 ├── structure.md                            # Complete file structure and workflow table
 ├── requirements.txt                        # All dependencies
 ├── .gitignore
