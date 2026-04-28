@@ -396,7 +396,15 @@ jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 ## Author
 
 **Grace Egbedion**
-Technical Program Manager | Cybersecurity Governance Specialist | PhD Candidate, Computational & Data Science
+Technical Program Manager | Cybersecurity Governance Specialist | PhD Candidate
+MTSU, Computational and Data Science
+
+Certifications: PMP, SAFe, PSM I/II, PSPO, CompTIA Security+
+
+Research: Human-factor risk analytics, AI governance, IT cybersecurity program management
+
+Publications: 5 peer-reviewed publications (2024-2025) | 27+ citations | 4,500+ reads
+
 [GitHub](https://github.com/GraceE-Dion) | [LinkedIn](https://www.linkedin.com/in/grace-egbedion/)
 
 ---
