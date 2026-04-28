@@ -436,6 +436,21 @@ jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 
 ---
 
+## Related Work
+
+This project is part of a 7-project ML portfolio in human-factor risk analytics
+for cybersecurity governance:
+
+1. **IT Project Risk Classification** *(this project)*
+2. [Insider Threat Detection - CERT r4.2](https://github.com/GraceE-Dion/Insider-Threat-Detection-CERT-r4.2)
+3. Network Intrusion Detection *(in development)*
+4. Phishing URL Detection *(planned)*
+5. Financial / Digital Banking ML Suite *(planned)*
+6. Medical Diagnosis Classification *(planned)*
+7. Manufacturing Defect Detection *(planned)*
+
+---
+
 ## Author
 
 **Grace Egbedion**
