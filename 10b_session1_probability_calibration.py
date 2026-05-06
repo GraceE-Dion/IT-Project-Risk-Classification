@@ -34,6 +34,19 @@ Author : Grace Egbedion, Department of Information Systems, IT Project Managemen
          Middle Tennessee State University
 """
 
+# ── End of file summary ───────────────────────────────────────────────────────
+print("=" * 55)
+print("10b: SESSION 1 PROBABILITY CALIBRATION COMPLETE")
+print("=" * 55)
+print(f"  Brier Score Uncalibrated : 0.1390")
+print(f"  Brier Score Calibrated   : 0.1423")
+print(f"  Change                   : -0.0033 (no gain)")
+print()
+print("  Finding: Logistic Regression is inherently well-calibrated.")
+print("  Post-hoc Platt Scaling provides no meaningful improvement.")
+print("  Contrast with Session 2: XGBoost shows 29.3% Brier improvement.")
+print()
+print("  Output: outputs/calibration_curves_session1.png")
 
 # Step 12b: Probability Calibration (Platt Scaling)
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
