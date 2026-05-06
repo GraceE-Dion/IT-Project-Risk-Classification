@@ -1,3 +1,62 @@
+"""
+16_session2_probability_calibration.py
+========================================
+Session 2 - Probability Calibration (Isotonic Regression)
+Dataset: NASA Metrics Data Program (MDP) JM1 (10,878 rows, 21 features)
+
+Applies Isotonic Regression post-hoc to the selected XGBoost model using
+CalibratedClassifierCV (cv='prefit') fitted on the validation set.
+Isotonic Regression is preferred over Platt Scaling for XGBoost because
+gradient boosting produces non-monotonic miscalibration that the
+non-parametric isotonic approach handles more effectively.
+
+Key Results:
+    Brier Score Uncalibrated      : 0.1989
+    Brier Score Calibrated        : 0.1406
+    Improvement                   : 0.0582 (29.3%)
+
+Finding: XGBoost produces meaningfully uncalibrated probability outputs,
+consistent with the known behaviour of gradient boosting methods which
+optimise a discriminative objective rather than a proper scoring rule.
+Isotonic Regression produces a 29.3% Brier Score improvement, enabling
+operationally meaningful risk threshold tuning. This contrasts with
+Session 1 where Logistic Regression showed no calibration gain (-0.0033).
+
+Governance alignment: NIST AI RMF 1.0 Manage function — calibrated
+probabilities allow setting alert thresholds below the default 0.50
+boundary (e.g. P(Defective) > 0.30) to reduce false negatives in
+high-stakes deployment contexts.
+
+Outputs:
+    outputs/calibration_curve_session2.png
+
+Dependencies: Requires xgb_final, X_train_resampled, X_val_scaled,
+y_val, X_test_scaled, y_test from 18_session2_final_evaluation.py
+
+Part of: IT Project Risk Classification Pipeline
+Paper  : A Supervised Machine Learning Framework for IT Project Risk Classification
+GitHub : https://github.com/GraceE-Dion/IT-Project-Risk-Classification
+Author : Grace Egbedion, Department of Information Systems, IT Project Management,
+         Middle Tennessee State University
+"""
+
+# ── End of file summary ───────────────────────────────────────────────────────
+print("=" * 55)
+print("16: SESSION 2 PROBABILITY CALIBRATION COMPLETE")
+print("=" * 55)
+print(f"  Brier Score Uncalibrated : 0.1989")
+print(f"  Brier Score Calibrated   : 0.1406")
+print(f"  Improvement              : 0.0582 (29.3%)")
+print()
+print("  Finding: XGBoost benefits significantly from Isotonic")
+print("  Regression calibration. Contrast with Session 1 where")
+print("  Logistic Regression showed no calibration gain (-0.0033).")
+print()
+print("  Operational implication: Set P(Defective) > 0.30 threshold")
+print("  rather than default 0.50 to reduce false negatives.")
+print()
+print("  Output: outputs/calibration_curve_session2.png")
+
 # Step 12b: Probability Calibration (Isotonic Regression)
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 from sklearn.metrics import brier_score_loss
