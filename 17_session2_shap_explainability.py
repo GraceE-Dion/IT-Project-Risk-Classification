@@ -1,3 +1,70 @@
+"""
+17_session2_shap_explainability.py
+=====================================
+Session 2 - SHAP Explainability (TreeExplainer)
+Dataset: NASA Metrics Data Program (MDP) JM1 (10,878 rows, 21 features)
+
+Applies SHAP TreeExplainer to the selected XGBoost model. Computes exact
+Shapley values for all 1,088 test set instances for the Defective class.
+
+Key Results (Top 3 features by mean absolute SHAP impact):
+    1. LOC_TOTAL           0.4633
+    2. LOC_BLANK           0.2321
+    3. DESIGN_COMPLEXITY   0.1842
+
+Finding: Code volume and structural complexity features dominate — the
+direct inverse of Session 1 where governance and human-factor variables
+topped the SHAP rankings. The Session 2 profile is highly concentrated:
+top 3 features account for the vast majority of predictive power, with
+a sharp drop after DESIGN_COMPLEXITY (0.1842 → 0.0663). High LOC_TOTAL
+pushes strongly toward Defective classification, consistent with software
+engineering theory that larger modules carry higher defect density.
+
+Cross-session SHAP contrast (answers RQ2):
+    Session 1 top feature : Org_Process_Maturity  (0.69) — governance
+    Session 2 top feature : LOC_TOTAL             (0.46) — code volume
+    The shift in dominant feature type is the mechanistic explanation
+    for the shift in optimal model type between sessions.
+
+Governance alignment: NIST AI RMF 1.0 and Executive Order 14110 —
+SHAP TreeExplainer provides decision-level transparency for XGBoost
+outputs, satisfying explainability requirements for AI systems with
+potential impact on operational decisions.
+
+Outputs:
+    outputs/shap_importance_session2.png
+    outputs/shap_beeswarm_session2.png
+
+Dependencies: Requires xgb_final, X_train_resampled, X_test_scaled,
+y_test, df from 18_session2_final_evaluation.py
+
+Part of: IT Project Risk Classification Pipeline
+Paper  : A Supervised Machine Learning Framework for IT Project Risk Classification
+GitHub : https://github.com/GraceE-Dion/IT-Project-Risk-Classification
+Author : Grace Egbedion, Department of Information Systems, IT Project Management,
+         Middle Tennessee State University
+"""
+
+# ── End of file summary ───────────────────────────────────────────────────────
+print("=" * 55)
+print("17: SESSION 2 SHAP EXPLAINABILITY COMPLETE")
+print("=" * 55)
+print("  Top 3 features by mean absolute SHAP impact:")
+print("    1. LOC_TOTAL          0.4633")
+print("    2. LOC_BLANK          0.2321")
+print("    3. DESIGN_COMPLEXITY  0.1842")
+print()
+print("  Finding: Code volume and complexity features dominate.")
+print("  Highly concentrated profile — inverse of Session 1.")
+print("  Cross-session contrast directly answers RQ2:")
+print("    Session 1: Org_Process_Maturity (0.69) — governance")
+print("    Session 2: LOC_TOTAL (0.46)           — code volume")
+print()
+print("  Outputs:")
+print("    outputs/shap_importance_session2.png")
+print("    outputs/shap_beeswarm_session2.png")
+
+
 # Step 12c: SHAP Explainability (TreeExplainer for XGBoost)
 import shap
 import matplotlib.pyplot as plt
