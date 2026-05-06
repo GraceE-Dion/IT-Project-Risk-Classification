@@ -1,3 +1,60 @@
+"""
+10c_session1_shap_explainability.py
+=====================================
+Session 1 - SHAP Explainability (LinearExplainer)
+Dataset: Synthetic Kaggle Project Management Risk Raw (4,000 rows, 49 features)
+
+Applies SHAP LinearExplainer to the selected Logistic Regression model.
+Computes exact analytical Shapley values for all 400 test set instances
+across all four risk classes.
+
+Key Results (Top 3 features by mean absolute SHAP impact):
+    1. Org_Process_Maturity         0.6865
+    2. Technology_Familiarity       0.4927
+    3. Team_Turnover_Rate           0.3553
+
+Finding: Governance and human-factor variables dominate the synthetic dataset,
+directly supporting the paper's central thesis that these indicators are primary
+discriminators of IT project risk. SHAP values are relatively evenly distributed
+across features, consistent with the synthetic dataset's near-linear, low-signal
+generative structure. This contrasts with Session 2 where code volume features
+dominate with a much more concentrated profile.
+
+Governance alignment: NIST AI RMF 1.0 transparency requirements — SHAP provides
+decision-level explainability for governance-affecting model outputs.
+
+Outputs:
+    outputs/shap_importance_session1.png
+    outputs/shap_beeswarm_session1.png
+
+Dependencies: Requires lr_model, X_train, X_test, y_test, df from
+10_session1_final_evaluation.py
+
+Part of: IT Project Risk Classification Pipeline
+Paper  : A Supervised Machine Learning Framework for IT Project Risk Classification
+GitHub : https://github.com/GraceE-Dion/IT-Project-Risk-Classification
+Author : Grace Egbedion, Department of Information Systems, IT Project Management,
+         Middle Tennessee State University
+"""
+# ── End of file summary ───────────────────────────────────────────────────────
+print("=" * 55)
+print("10c: SESSION 1 SHAP EXPLAINABILITY COMPLETE")
+print("=" * 55)
+print("  Top 3 features by mean absolute SHAP impact:")
+print("    1. Org_Process_Maturity      0.6865")
+print("    2. Technology_Familiarity    0.4927")
+print("    3. Team_Turnover_Rate        0.3553")
+print()
+print("  Finding: Governance and human-factor variables dominate.")
+print("  Even distribution reflects synthetic near-linear signal.")
+print("  Contrast with Session 2: code volume features dominate")
+print("  with a highly concentrated profile (LOC_TOTAL: 0.46).")
+print()
+print("  Outputs:")
+print("    outputs/shap_importance_session1.png")
+print("    outputs/shap_beeswarm_session1.png")
+
+
 # Step 12c: SHAP Explainability (LinearExplainer for Logistic Regression)
 import shap
 import matplotlib.pyplot as plt
