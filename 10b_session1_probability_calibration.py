@@ -1,3 +1,40 @@
+"""
+10b_session1_probability_calibration.py
+========================================
+Session 1 - Probability Calibration (Platt Scaling)
+Dataset: Synthetic Kaggle Project Management Risk Raw (4,000 rows, 49 features)
+
+Applies Platt Scaling post-hoc to the selected Logistic Regression model
+using CalibratedClassifierCV (cv='prefit') fitted on the validation set.
+Brier Score is used to assess calibration quality (0 = perfect, 0.25 = no skill).
+
+Key Result:
+    Brier Score Uncalibrated : 0.1390
+    Brier Score Calibrated   : 0.1423
+    Change                   : -0.0033 (no meaningful improvement)
+
+Finding: Logistic Regression is inherently well-calibrated because it directly
+optimises log-loss during training. Post-hoc Platt Scaling provides no gain.
+This contrasts with Session 2 (XGBoost) where Isotonic Regression produces
+a 29.3% Brier Score improvement.
+
+Governance alignment: NIST AI RMF 1.0 Manage function — calibrated probabilities
+enable risk threshold tuning for operational deployment.
+
+Outputs:
+    outputs/calibration_curves_session1.png
+
+Dependencies: Requires lr_model, X_val, y_val, X_test, y_test from
+10_session1_final_evaluation.py
+
+Part of: IT Project Risk Classification Pipeline
+Paper  : A Supervised Machine Learning Framework for IT Project Risk Classification
+GitHub : https://github.com/GraceE-Dion/IT-Project-Risk-Classification
+Author : Grace Egbedion, Department of Information Systems, IT Project Management,
+         Middle Tennessee State University
+"""
+
+
 # Step 12b: Probability Calibration (Platt Scaling)
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 import matplotlib.pyplot as plt
