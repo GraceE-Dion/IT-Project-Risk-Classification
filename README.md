@@ -344,38 +344,38 @@ Code volume and structural complexity features dominate — the direct inverse o
 
 ### Session 1 - Synthetic Dataset (Logistic Regression)
 <p align="center">
-  <img src="images/classification_report_session1.png" width="70%" />
+  <img src="images/classification_report_session1.jpg" width="70%" />
 </p>
 <p align="center">
-  <img src="images/confusion_matrix_session1.png" width="60%" />
+  <img src="images/confusion_matrix_session1.jog" width="60%" />
 </p>
 <p align="center">
-  <img src="images/shap_importance_session1.png" width="75%" />
+  <img src="images/shap_importance_session1.jpg" width="75%" />
 </p>
 <p align="center">
-  <img src="images/shap_beeswarm_session1.png" width="75%" />
+  <img src="images/shap_beeswarm_session1.jpg" width="75%" />
 </p>
 <p align="center">
-  <img src="images/calibration_curves_session1.png" width="80%" />
+  <img src="images/calibration_curves_session1.jpg" width="80%" />
 </p>
 
 <hr>
 
 ### Session 2 - NASA Raw MDP (XGBoost)
 <p align="center">
-  <img src="images/classification_report_session2.png" width="70%" />
+  <img src="images/classification_report_session2.jpg" width="70%" />
 </p>
 <p align="center">
-  <img src="images/confusion_matrix_session2.png" width="60%" />
+  <img src="images/confusion_matrix_session2.jpg" width="60%" />
 </p>
 <p align="center">
-  <img src="images/shap_importance_session2.png" width="75%" />
+  <img src="images/shap_importance_session2.jpg" width="75%" />
 </p>
 <p align="center">
-  <img src="images/shap_beeswarm_session2.png" width="75%" />
+  <img src="images/shap_beeswarm_session2.jpg" width="75%" />
 </p>
 <p align="center">
-  <img src="images/calibration_curve_session2.png" width="70%" />
+  <img src="images/calibration_curve_session2.jpg" width="70%" />
 </p>
 
 ---
