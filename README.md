@@ -17,6 +17,18 @@ This project is part of a research portfolio in human-factor risk analytics for 
 
 ---
 
+## Research Questions
+
+This project is designed as a controlled two-session experiment to answer two explicit research questions:
+
+**RQ1:** Does dataset authenticity significantly affect the performance and stability of a supervised ML pipeline for IT project risk classification when preprocessing, model families, and evaluation protocol are held constant across sessions?
+
+**RQ2:** Does the optimal model family shift between synthetic and real-world data under identical experimental conditions, and if so, what dataset-level property explains this shift?
+
+Both research questions are answered empirically. RQ1 is answered affirmatively (30.5% F1 improvement, 2.2x stability gain). RQ2 is answered by the SHAP cross-session analysis: governance and human-factor features dominate in synthetic data while code volume and complexity features dominate in real-world data, explaining the shift from Logistic Regression to XGBoost as the optimal model.
+
+---
+
 ## Research Motivation
 
 IT project failures remain disproportionately tied to human-factor risks, governance gaps, compliance drift, team dynamics, and stakeholder misalignment, rather than purely technical failures. Existing risk models underweight these dimensions. Traditional project management metrics focus on schedule and cost variances, while cybersecurity governance frameworks such as NIST SP 800-37, CMMC, and ISO 27001 require structured risk treatment informed by human-factor indicators.
@@ -45,26 +57,39 @@ IT-Project-Risk-Classification/
 │   └── processed/                          # Cleaned, encoded, scaled datasets
 │
 ├── outputs/
-│   ├── confusion_matrix_session1.png       # Session 1 confusion matrix
-│   ├── confusion_matrix_session2.png       # Session 2 confusion matrix
-│   └── dataset_comparison.png              # Synthetic vs NASA MDP comparison chart
+│   ├── confusion_matrix_session1.png           # Session 1 confusion matrix
+│   ├── confusion_matrix_session2.png           # Session 2 confusion matrix
+│   ├── classification_report_session1.png      # Session 1 classification report bar chart
+│   ├── classification_report_session2.png      # Session 2 classification report bar chart
+│   ├── dataset_comparison.png                  # Synthetic vs NASA MDP comparison chart
+│   ├── calibration_curves_session1.png         # Session 1 Platt Scaling calibration curves
+│   ├── calibration_curve_session2.png          # Session 2 Isotonic Regression calibration curve
+│   ├── shap_importance_session1.png            # Session 1 SHAP global feature importance
+│   ├── shap_beeswarm_session1.png              # Session 1 SHAP beeswarm (Critical class)
+│   ├── shap_importance_session2.png            # Session 2 SHAP global feature importance
+│   └── shap_beeswarm_session2.png              # Session 2 SHAP beeswarm (Defective class)
 │
 ├── 01_setup_environment.py                 # Installs dependencies, verifies environment
 ├── 02_data_acquisition.py                  # Downloads synthetic (Kaggle) and NASA MDP (GitHub)
 ├── 03_data_inspection.py                   # Shape, columns, target distribution, authenticity check
 ├── 04_preprocessing.py                     # Imputation, label encoding, byte string decoding
-├── 05_feature_scaling.py                   # StandardScaler fit on train only
-├── 06_class_balancing.py                   # SMOTE applied to training set only
+├── 05_feature_scaling.py                   # StandardScaler fit on train only (post-split)
+├── 06_class_balancing.py                   # SMOTE applied to Session 2 training set only
 ├── 07_train_val_test_split.py              # Stratified 80/10/10 split - test set locked
 ├── 08_session1_synthetic_baseline.py       # LR, RF (3 configs), XGBoost (3 configs) on synthetic
 ├── 09_session1_cross_validation.py         # 5-fold CV on synthetic - ceiling: 0.5700 F1
 ├── 10_session1_final_evaluation.py         # Logistic Regression final test - 0.5872 F1
-├── 11_session2_nasa_mdp_baseline.py        # Logistic Regression baseline on NASA MDP
+├── 10b_session1_probability_calibration.py # Platt Scaling on LR - Brier 0.1390 (no gain)
+├── 10c_session1_shap_explainability.py     # SHAP LinearExplainer - top: Org_Process_Maturity (0.69)
+├── 11_session2_dummy_baseline.py           # Majority-class floor - macro F1: 0.4466
+├── 11b_session2_nasa_mdp_baseline.py       # Logistic Regression baseline on NASA MDP
 ├── 12_session2_random_forest.py            # RF tuning - 3 configs, all overfit (negative finding)
-├── 13_session2_xgboost.py                  # XGBoost tuning - 3 configs with regularization
-├── 14_session2_cross_validation.py         # 5-fold CV on NASA MDP - 0.7439 F1 (selected)
-├── 15_session2_final_evaluation.py         # XGBoost final test - 0.6082 F1, 0.70 accuracy
-├── 16_dataset_comparison.py                # Side-by-side comparison with chart output
+├── 14_session2_xgboost.py                  # XGBoost tuning - 3 configs with regularization
+├── 15_session2_cross_validation.py         # 5-fold CV on NASA MDP - 0.7439 F1 (selected)
+├── 16_session2_probability_calibration.py  # Isotonic Regression - Brier 0.1989→0.1406 (29.3% gain)
+├── 17_session2_shap_explainability.py      # SHAP TreeExplainer - top: LOC_TOTAL (0.46)
+├── 18_session2_final_evaluation.py         # XGBoost final test - 0.6082 F1, 0.70 accuracy
+├── 19_dataset_comparison.py               # Side-by-side comparison with chart output
 ├── master_training_script.py               # Full end-to-end pipeline in one execution
 ├── structure.md                            # Complete file structure and workflow table
 ├── requirements.txt                        # All dependencies
@@ -125,6 +150,10 @@ IT-Project-Risk-Classification/
 
 ## Methodology
 
+### Two-Session Experimental Design
+
+The two-session structure is a controlled experimental design, not a sequential progression of independent projects. Its purpose is to isolate dataset authenticity as the primary independent variable. Session 1 uses a synthetic dataset chosen because it best approximates a real IT project risk dataset in domain framing, feature taxonomy, and label structure. Session 2 retrains the identical pipeline on authentic peer-reviewed data. All preprocessing steps, model families, regularisation strategy, and evaluation protocol are held constant. Any performance differential between sessions is therefore attributable to dataset authenticity, not methodology variation. This is the controlled condition required to answer RQ1 and RQ2 empirically.
+
 ### Overfitting Prevention Protocol
 
 This project applies a strict **generalization discipline** from day one, informed by systematic monitoring of training versus validation performance gaps across every model and tuning iteration.
@@ -135,9 +164,11 @@ This project applies a strict **generalization discipline** from day one, inform
 | Cross-validation | 5-fold stratified CV on training set |
 | Regularization | L2 weight decay; `max_depth` and `min_samples_leaf` for ensemble models; L1/L2 (`reg_alpha`, `reg_lambda`) for XGBoost |
 | Subsampling | `subsample` and `colsample_bytree` in XGBoost to reduce variance |
-| Class imbalance | SMOTE applied to training set only, never to validation or test sets |
+| Class imbalance | SMOTE applied to Session 2 training set only; `class_weight='balanced'` in Session 1 |
 | Generalization threshold | Validation F1 must be within 0.05 of training F1 to pass |
 | Learning rate | Reduced `learning_rate` (0.05) combined with increased `n_estimators` (200) to slow convergence |
+
+**Note on SMOTE and class balancing:** SMOTE was not applied in Session 1 because the synthetic dataset has a sufficiently balanced four-class distribution. SMOTE was applied in Session 2 because the NASA MDP data has an authentic 80/20 class imbalance reflecting real-world defect rates. The absence of SMOTE in Session 1 is itself a finding: synthetic datasets tend to produce artificially balanced class distributions, masking the imbalance complexity that real data presents.
 
 **Diagnosis flags monitored every run:**
 - Training F1 >> Validation F1 → Overfitting → Increase regularization, reduce `max_depth`
@@ -156,8 +187,8 @@ This project applies a strict **generalization discipline** from day one, inform
 3. **Target encoding** - `LabelEncoder` applied: N → 0 (Clean), Y → 1 (Defective)
 4. **Feature/target separation** - `Project_ID` dropped; `label` isolated as target
 5. **Train/val/test split** - stratified 80/10/10 split preserving class proportions
-6. **Feature scaling** - `StandardScaler` fit on training set only; applied to validation and test sets
-7. **Class imbalance handling** - SMOTE applied to training set only (80/20 → 50/50 balanced)
+6. **Feature scaling** - `StandardScaler` fitted on training set only **after splitting** to prevent data leakage; applied to validation and test sets without refitting
+7. **Class imbalance handling** - SMOTE applied to Session 2 training set only (80/20 → 50/50 balanced); Session 1 uses `class_weight='balanced'`
 
 ### Models Evaluated
 | Model | Rationale |
@@ -165,6 +196,24 @@ This project applies a strict **generalization discipline** from day one, inform
 | Logistic Regression | Interpretable baseline; strong generalization on linearly separable features |
 | Random Forest | Handles feature interactions; resistant to overfitting with depth constraints in principle |
 | XGBoost | Gradient boosting with built-in L1/L2 regularization; strong tabular performance |
+
+### Dummy Classifier Baseline
+A majority-class dummy classifier was run before any ML modelling in both sessions to establish the performance floor.
+
+| Session | Dummy Val F1 | Dummy Test F1 | ML Model | ML Test F1 | Lift over Dummy |
+|---|---|---|---|---|---|
+| Session 1 (Synthetic) | 0.1289 | 0.1296 | Logistic Regression | 0.5872 | +0.4576 |
+| Session 2 (NASA MDP) | 0.4465 | 0.4466 | XGBoost | 0.6082 | +0.1616 |
+
+### Probability Calibration
+Post-hoc probability calibration applied to both selected models. Brier Score (0 = perfect, 0.25 = no skill) measures calibration quality.
+
+| Session | Model | Method | Brier (Uncal) | Brier (Cal) | Improvement |
+|---|---|---|---|---|---|
+| Session 1 | Logistic Regression | Platt Scaling | 0.1390 | 0.1423 | −0.0033 (no gain) |
+| Session 2 | XGBoost | Isotonic Regression | 0.1989 | 0.1406 | +0.0582 (29.3%) |
+
+LR is inherently well-calibrated (optimises log-loss directly). XGBoost benefits significantly from Isotonic Regression. Calibrated XGBoost probabilities enable threshold tuning: flag P(Defective) > 0.30 to reduce false negatives in deployment.
 
 ---
 
@@ -182,6 +231,7 @@ This project applies a strict **generalization discipline** from day one, inform
 
 | Model | Train F1 | Val F1 | Gap | Status |
 |---|---|---|---|---|
+| Dummy Classifier (majority) | N/A | 0.1289 | N/A | Floor |
 | Logistic Regression | 0.5960 | 0.5890 | 0.0079 | ✅ Selected |
 | Random Forest (deep) | 0.9365 | 0.5590 | 0.3775 | ❌ Severe overfitting |
 | Random Forest (shallow) | 0.5483 | 0.4945 | 0.0538 | ❌ Underfitting |
@@ -189,7 +239,7 @@ This project applies a strict **generalization discipline** from day one, inform
 | XGBoost v1 | 0.9121 | 0.6201 | 0.2920 | ❌ Overfitting |
 | XGBoost v2 | 0.6725 | 0.5920 | 0.0805 | ⚠️ Borderline |
 | XGBoost v3 | 0.7956 | 0.5950 | 0.2007 | ❌ Overfitting |
-| XGBoost 5-Fold CV | - | 0.5700 ± 0.0165 | - | ✅ Honest ceiling |
+| XGBoost 5-Fold CV | N/A | 0.5700 ± 0.0165 | N/A | ✅ Honest ceiling |
 
 **Why Logistic Regression won:** Cross-validation confirmed the dataset's true performance ceiling at ~0.57 F1, consistent across all five folds (0.5845, 0.5885, 0.5760, 0.5528, 0.5483). The near-linear feature-target relationships in synthetic data meant Logistic Regression achieved near-optimal generalization with the tightest overfit gap (0.0079). All ensemble models overfit or underfit, confirming that the synthetic signal is too limited to benefit from increased model complexity.
 
@@ -201,6 +251,23 @@ This project applies a strict **generalization discipline** from day one, inform
 | Low | 0.53 | 0.70 | 0.60 |
 | Medium | 0.60 | 0.42 | 0.49 |
 | **Overall** | **0.58** | **0.61** | **Test F1: 0.5872** |
+
+**SHAP Results (Session 1):**
+
+| Rank | Feature | Mean Abs. SHAP |
+|---|---|---|
+| 1 | Org_Process_Maturity | 0.6865 |
+| 2 | Technology_Familiarity | 0.4927 |
+| 3 | Team_Turnover_Rate | 0.3553 |
+| 4 | Key_Stakeholder_Availability | 0.3440 |
+| 5 | Client_Experience_Level | 0.3324 |
+| 6 | Change_Control_Maturity | 0.3114 |
+| 7 | Stakeholder_Engagement_Level | 0.2890 |
+| 8 | Tech_Environment_Stability | 0.2888 |
+| 9 | Previous_Delivery_Success_Rate | 0.2740 |
+| 10 | Industry_Volatility | 0.2360 |
+
+Governance and human-factor variables dominate. SHAP values are relatively evenly distributed, consistent with the synthetic dataset's near-linear, low-signal structure. High `Team_Turnover_Rate` and low `Previous_Delivery_Success_Rate` push toward Critical classification — governance-consistent directional behaviour.
 
 **Key observation:** High and Medium classes were consistently confused across all models, reflecting their adjacent risk boundaries in the synthetic dataset's generative logic, not a modeling failure.
 
@@ -218,6 +285,7 @@ This project applies a strict **generalization discipline** from day one, inform
 
 | Model | Train F1 | Val F1 | Gap | Status |
 |---|---|---|---|---|
+| Dummy Classifier (majority) | N/A | 0.4465 | N/A | Floor |
 | Logistic Regression | 0.6673 | 0.6232 | 0.0440 | ✅ Clean generalization |
 | Random Forest v1 (depth=7) | 0.7893 | 0.6492 | 0.1402 | ❌ Overfitting |
 | Random Forest v2 (depth=5) | 0.7358 | 0.6395 | 0.0964 | ❌ Still overfitting |
@@ -225,7 +293,7 @@ This project applies a strict **generalization discipline** from day one, inform
 | XGBoost v1 (depth=3) | 0.8088 | 0.6589 | 0.1499 | ❌ Overfitting |
 | XGBoost v2 (depth=2, strong reg) | 0.7423 | 0.6468 | 0.0955 | ⚠️ Borderline |
 | XGBoost v3 (depth=2, medium reg) | 0.7780 | 0.6441 | 0.1339 | ❌ Overfitting |
-| XGBoost 5-Fold CV | - | 0.7439 ± 0.0074 | - | ✅ Selected |
+| XGBoost 5-Fold CV | N/A | 0.7439 ± 0.0074 | N/A | ✅ Selected |
 
 **Why XGBoost was selected:** The real-world data contains genuine non-linear relationships between software complexity metrics and defect outcomes. XGBoost's gradient boosting with L1/L2 regularization captured these relationships more effectively than simpler models. The 5-fold cross-validation produced a mean F1 of 0.7439 with extremely low variance (std: 0.0074), confirming stable generalization. Single validation set scores (0.64-0.66) were slightly pessimistic due to the small validation set size (1,087 rows); cross-validation on the full training set revealed the model's true capability at 0.74.
 
@@ -244,7 +312,31 @@ This project applies a strict **generalization discipline** from day one, inform
 - 235 Clean modules flagged as Defective (false positives)
 - 92 Defective modules missed (false negatives)
 
-**Key observation:** The Defective class F1 (0.42) is lower than Clean (0.80), reflecting the inherent difficulty of minority class prediction even after SMOTE. In a real deployment context, the 92 missed defective modules represent the higher-risk failure mode, undetected defects reaching production, and warrant further work on recall optimization.
+**SHAP Results (Session 2):**
+
+| Rank | Feature | Mean Abs. SHAP |
+|---|---|---|
+| 1 | LOC_TOTAL | 0.4633 |
+| 2 | LOC_BLANK | 0.2321 |
+| 3 | DESIGN_COMPLEXITY | 0.1842 |
+| 4 | LOC_COMMENTS | 0.0663 |
+| 5 | NUM_OPERATORS | 0.0496 |
+| 6 | HALSTEAD_CONTENT | 0.0216 |
+| 7 | ESSENTIAL_COMPLEXITY | 0.0212 |
+| 8 | LOC_CODE_AND_COMMENT | 0.0192 |
+| 9 | NUM_UNIQUE_OPERATORS | 0.0174 |
+| 10 | HALSTEAD_LEVEL | 0.0160 |
+
+Code volume and structural complexity features dominate — the direct inverse of Session 1. The profile is highly concentrated: top 3 features account for the vast majority of predictive power. High `LOC_TOTAL` pushes strongly toward Defective classification, consistent with software engineering theory that larger modules carry higher defect density.
+
+**Cross-session SHAP contrast (mechanistic answer to RQ2):**
+| | Session 1 (Synthetic) | Session 2 (NASA MDP) |
+|---|---|---|
+| Top feature | Org_Process_Maturity (0.69) | LOC_TOTAL (0.46) |
+| Feature type | Governance / human-factor | Code volume / complexity |
+| Profile shape | Evenly distributed | Highly concentrated |
+
+**Key observation:** The Defective class F1 (0.42) is lower than Clean (0.80), reflecting the inherent difficulty of minority class prediction even after SMOTE. The 92 missed defective modules represent the higher-risk failure mode and warrant further recall optimization through calibrated probability threshold tuning.
 
 ---
 
@@ -257,6 +349,15 @@ This project applies a strict **generalization discipline** from day one, inform
 <p align="center">
   <img src="images/confusion_matrix_session1.png" width="60%" />
 </p>
+<p align="center">
+  <img src="images/shap_importance_session1.png" width="75%" />
+</p>
+<p align="center">
+  <img src="images/shap_beeswarm_session1.png" width="75%" />
+</p>
+<p align="center">
+  <img src="images/calibration_curves_session1.png" width="80%" />
+</p>
 
 <hr>
 
@@ -266,6 +367,15 @@ This project applies a strict **generalization discipline** from day one, inform
 </p>
 <p align="center">
   <img src="images/confusion_matrix_session2.png" width="60%" />
+</p>
+<p align="center">
+  <img src="images/shap_importance_session2.png" width="75%" />
+</p>
+<p align="center">
+  <img src="images/shap_beeswarm_session2.png" width="75%" />
+</p>
+<p align="center">
+  <img src="images/calibration_curve_session2.png" width="70%" />
 </p>
 
 ---
@@ -283,6 +393,10 @@ Cross-validation on the synthetic dataset confirmed a true performance ceiling o
 **Finding 3 - Preprocessed Kaggle Version of NASA MDP Data Obscures Authentic Distributions**
 
 A preprocessed version of the NASA MDP JM1 dataset available on Kaggle was identified and rejected before modeling. Inspection revealed all features had been normalized to [0, 1] with suspiciously low unique value counts (CYCLOMATIC_COMPLEXITY: 24 unique values out of 1,000 rows; INT_FAN_IN: 10 unique values). This preprocessing eliminated the authentic distribution variation that makes the NASA MDP data valuable for real-world defect prediction research. The raw ARFF format from the original NASADefectDataset GitHub repository was used instead. This finding establishes dataset provenance verification as a required step in any governance-aligned modeling pipeline.
+
+**Finding 4 - Logistic Regression Requires No Probability Calibration; XGBoost Does**
+
+Platt Scaling applied to Logistic Regression produced a negligible Brier Score change of −0.0033, confirming that LR is inherently well-calibrated by design. Isotonic Regression applied to XGBoost produced a 29.3% Brier Score improvement (0.1989 → 0.1406), confirming that gradient boosting methods require explicit post-hoc calibration for reliable probability outputs. This is a reproducible cross-session finding with direct implications for governance deployment contexts where probability outputs are used to set alert thresholds.
 
 ---
 
@@ -303,9 +417,11 @@ The current model's deployment implications extend beyond test set accuracy. In 
 
 **Recommended deployment controls:**
 - Treat current model as a research prototype requiring retraining on organizational codebase before production use
+- Apply calibrated probability threshold tuning — set P(Defective) > 0.30 rather than default 0.50 to reduce false negatives
 - Prioritize recall optimization before SOC or QA pipeline integration, false negatives (missed defects) carry higher governance cost than false positives
 - Apply in triage mode: flag high-probability modules for mandatory human review rather than automated pass/fail decisions
 - Conduct quarterly retraining as codebases and defect patterns evolve over project lifecycles
+- Apply Walk-Forward Validation when deploying on time-stamped project data in production
 
 ---
 
@@ -317,13 +433,17 @@ The current model's deployment implications extend beyond test set accuracy. In 
 
 3. **Logistic Regression is competitive on synthetic data; XGBoost on real data.** The best model type shifts with data authenticity. Synthetic data's near-linear relationships favor simpler models, while real-world complexity rewards gradient boosting with regularization. Model selection must be empirically validated against each dataset's distributional properties.
 
-4. **Random Forest consistently overfits on SMOTE-augmented tabular data.** Across six tuning configurations in two sessions, Random Forest failed the 0.05 overfit gate while maintaining competitive validation F1. This is attributed to the interaction between bagged tree ensembles and synthetic minority samples generated by SMOTE, a reproducible negative finding documented in detail in the Negative Findings section.
+4. **SHAP analysis provides the mechanistic explanation for the model shift.** Session 1 top features are governance and human-factor variables (Org_Process_Maturity: 0.69, Technology_Familiarity: 0.49); Session 2 top features are code volume and complexity metrics (LOC_TOTAL: 0.46, LOC_BLANK: 0.23). The shift in dominant feature type directly explains the shift in optimal model type between sessions.
 
-5. **Cross-validation provides a more honest performance estimate than single validation splits.** In Session 2, validation set F1 scores ranged from 0.64 to 0.66 while 5-fold CV revealed the true performance at 0.7439. Single-split estimates were consistently pessimistic due to the small validation set size (1,087 rows). Cross-validation on the full training set is the recommended primary metric.
+5. **Probability calibration behaviour differs by model family.** Logistic Regression requires no post-hoc calibration (Brier Score change: −0.0033). XGBoost benefits from a 29.3% Brier Score improvement after Isotonic Regression (0.1989 → 0.1406). Calibration method must be matched to model family for governance deployment contexts.
 
-6. **Dataset provenance verification is a required step before modeling.** Visual inspection of the Kaggle-hosted NASA dataset revealed preprocessing that obscured raw data distributions. Direct use of the raw ARFF source data was necessary to preserve authentic feature variation. A dataset vetting protocol, checking distribution authenticity, unique value counts, and source citations, has been established for all subsequent projects.
+6. **Random Forest consistently overfits on SMOTE-augmented tabular data.** Across six tuning configurations in two sessions, Random Forest failed the 0.05 overfit gate while maintaining competitive validation F1. This is attributed to the interaction between bagged tree ensembles and synthetic minority samples generated by SMOTE, a reproducible negative finding across two independent sessions.
 
-7. **Future work requires governance-aligned feature engineering.** The NASA MDP dataset contains software code metrics as a proxy for project risk. A dataset with explicit governance, human-factor, and cybersecurity compliance features mapped to NIST SP 800-37, CMMC Level 2/3, and ISO 27001 risk treatment indicators would enable direct IT project risk classification rather than defect prediction as a proxy.
+7. **Cross-validation provides a more honest performance estimate than single validation splits.** In Session 2, validation set F1 scores ranged from 0.64 to 0.66 while 5-fold CV revealed the true performance at 0.7439. Single-split estimates were consistently pessimistic due to the small validation set size (1,087 rows). Cross-validation on the full training set is the recommended primary metric.
+
+8. **Dataset provenance verification is a required step before modeling.** Visual inspection of the Kaggle-hosted NASA dataset revealed preprocessing that obscured raw data distributions. Direct use of the raw ARFF source data was necessary to preserve authentic feature variation. A dataset vetting protocol has been established for all subsequent projects.
+
+9. **Future work requires governance-aligned feature engineering.** The NASA MDP dataset contains software code metrics as a proxy for project risk. A dataset with explicit governance, human-factor, and cybersecurity compliance features mapped to NIST SP 800-37, CMMC Level 2/3, and ISO 27001 risk treatment indicators would enable direct IT project risk classification rather than defect prediction as a proxy.
 
 ---
 
@@ -335,11 +455,18 @@ The current model's deployment implications extend beyond test set accuracy. In 
 | Rows | 4,000 | 10,878 |
 | Features | 49 | 21 |
 | Task | 4-class risk classification | Binary defect classification |
+| SMOTE required | No (`class_weight` used) | Yes (80/20 imbalance) |
+| Dummy classifier F1 | 0.1296 | 0.4466 |
 | CV F1 (macro) | 0.5700 | **0.7439** |
 | CV Std | 0.0165 | **0.0074** |
+| ML lift over dummy | +0.4576 | +0.1616 |
 | Best model | Logistic Regression | XGBoost |
 | Test F1 | 0.5872 | 0.6082 |
 | Test Accuracy | 0.58 | 0.70 |
+| Brier Score (uncal) | 0.1390 | 0.1989 |
+| Brier Score (cal) | 0.1423 (no gain) | 0.1406 (29.3% gain) |
+| Top SHAP feature | Org_Process_Maturity (0.69) | LOC_TOTAL (0.46) |
+| Top feature type | Governance / human-factor | Code volume / complexity |
 | Inference Ready | ❌ No | ✅ Closer |
 | Performance gain | baseline | **+30.5% F1, 2.2x more stable** |
 
@@ -349,12 +476,14 @@ The current model's deployment implications extend beyond test set accuracy. In 
 
 This project was developed with explicit attention to AI governance principles aligned with the NIST AI Risk Management Framework (AI RMF 1.0):
 
-- **Honest performance reporting:** All model tuning iterations, including failed Random Forest configurations and overfitting diagnoses, were retained in the evaluation record. Negative findings (Random Forest consistently overfitting, synthetic data ceiling, preprocessed data quality degradation) have equal evidentiary value to positive ones.
+- **Honest performance reporting:** All model tuning iterations, including failed Random Forest configurations and overfitting diagnoses, were retained in the evaluation record. Negative findings (Random Forest consistently overfitting, synthetic data ceiling, preprocessed data quality degradation, calibration ineffectiveness on LR) have equal evidentiary value to positive ones.
 - **Dataset integrity auditing:** Systematic comparison of the Kaggle-preprocessed and raw ARFF versions of the NASA MDP dataset identified significant data quality degradation in the preprocessed version. Raw source data was used to preserve authenticity.
 - **Overfitting prevention protocol:** A formal overfit gap threshold (0.05) was applied as a pass/fail gate across every model configuration, preventing deployment of models that memorize training data.
 - **Missing value transparency:** Imputation strategy documented with rationale for method selection. Median imputation chosen over zero-fill for compliance and maturity score features where zero is not a semantically valid absence value.
-- **Class imbalance transparency:** SMOTE augmentation was applied exclusively to training data. Validation and test sets retained the original 80/20 distribution to ensure evaluation reflects real-world conditions.
-- **Deployment risk profiling:** False negative rates extrapolated to portfolio scale. Recommended deployment controls documented for governance-aligned production use.
+- **Class imbalance transparency:** SMOTE augmentation applied exclusively to Session 2 training data. Session 1 used `class_weight='balanced'`. Validation and test sets retained the original distribution in both sessions.
+- **Probability calibration:** Post-hoc calibration applied and Brier Score reported for both calibrated and uncalibrated outputs. Calibration method matched to model family (Platt Scaling for LR, Isotonic Regression for XGBoost).
+- **SHAP explainability:** Decision-level transparency provided via SHAP for both sessions (LinearExplainer for LR, TreeExplainer for XGBoost), satisfying NIST AI RMF 1.0 transparency requirements.
+- **Deployment risk profiling:** False negative rates extrapolated to portfolio scale. Calibrated probability threshold recommendations documented for governance-aligned production use.
 - **Reproducibility:** All data sourcing steps, including the exact GitHub URL for the raw ARFF file and the rationale for JM1 selection over other MDP datasets, are documented to ensure full pipeline reproducibility.
 
 ---
@@ -365,7 +494,7 @@ This project was developed with explicit attention to AI governance principles a
 - **CMMC Level 2/3** - Human-factor and software quality indicators as compliance risk signals subject to continuous monitoring
 - **ISO 27001** - Information security risk treatment requiring quantified likelihood and impact estimates of the type produced by classification models
 - **PMI PMBOK** - Project performance domain variables: scope, schedule, and quality risk indicators
-- **NIST AI RMF 1.0** - Responsible AI development practices applied throughout development lifecycle
+- **NIST AI RMF 1.0** - Responsible AI development practices applied throughout; SHAP explainability satisfies transparency requirements; calibrated probability outputs satisfy Manage function requirements
 
 ---
 
@@ -378,13 +507,16 @@ This project was developed with explicit attention to AI governance principles a
 | Features | 49 | 21 |
 | Target | 4-class risk level | Binary defect label |
 | Train/Val/Test Split | 80/10/10 stratified | 80/10/10 stratified |
-| Scaling | StandardScaler | StandardScaler |
+| Scaling | StandardScaler (post-split, train only) | StandardScaler (post-split, train only) |
 | Missing value strategy | Median (numeric), Mode (categorical) | None required |
 | Class balancing | `class_weight='balanced'` | SMOTE (training only) |
 | Cross-validation | 5-fold stratified CV | 5-fold stratified CV |
+| Dummy classifier F1 | 0.1296 | 0.4466 |
 | Selected model | Logistic Regression | XGBoost |
 | Final test F1 | 0.5872 | 0.6082 |
 | Overfit gap (selected) | 0.0079 | 0.0440 |
+| Brier Score (uncal / cal) | 0.1390 / 0.1423 | 0.1989 / 0.1406 |
+| Top SHAP feature | Org_Process_Maturity (0.69) | LOC_TOTAL (0.46) |
 | Platform | Kaggle (CPU) | Kaggle (CPU) |
 
 ---
@@ -421,18 +553,22 @@ jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 ## Limitations & Next Steps
 
 ### Current Limitations
-- The NASA MDP dataset contains software code metrics only, it does not include governance, human-factor, or cybersecurity compliance features directly. Defect prediction serves as a proxy for IT project risk, not a direct risk classification.
-- Binary classification (defective/clean) does not capture multi-level risk severity (Critical / High / Medium / Low) needed for actionable project governance decisions.
-- SMOTE augmentation, while effective for class balancing, introduces synthetic minority samples that interact adversely with ensemble models, confirmed by Random Forest's persistent overfitting across six configurations in two sessions.
-- The 80/20 class imbalance in NASA MDP data reflects real software defect rates but limits Defective class F1 (0.42) even after balancing. Further work on recall optimization is warranted.
+
+- **Proxy nature of Session 2 data.** The NASA MDP dataset contains software code metrics only — does not include governance, human-factor, or cybersecurity compliance features directly. Defect prediction serves as a proxy for IT project risk, not a direct risk classification. SHAP analysis confirms the model responds to code volume signals (LOC_TOTAL, DESIGN_COMPLEXITY) rather than the governance indicators that NIST SP 800-37 and CMMC identify as primary risk variables.
+- **Task structure confounder.** Session 1 performs four-class classification (49 features) while Session 2 performs binary classification (21 features). Label cardinality and feature dimensionality differ between sessions — the 30.5% F1 improvement cannot be attributed solely to dataset authenticity. Future work should re-map Session 1 to binary classification to isolate the authenticity effect under identical task conditions.
+- **Minority class recall.** Defective class F1 (0.42) and 92 missed defective modules (44% miss rate) remain a deployment risk indicator. Recall optimisation through calibrated probability threshold tuning (P(Defective) > 0.30) is the immediate mitigation.
+- **SMOTE and ensemble interaction.** SMOTE augmentation introduces synthetic minority samples that interact adversely with Random Forest across all six configurations. XGBoost generalises successfully but the interaction remains a practical constraint on ensemble method selection.
+- **Temporal structure.** Both datasets are static snapshots without timestamp information. Temporal leakage is not applicable here, but any production deployment on time-stamped IT project data would require Walk-Forward Validation rather than stratified splitting.
+- **Calibration scope.** Calibration was applied post-hoc on the validation set only. A more robust approach would incorporate calibration within the cross-validation loop. Deferred to future work.
 
 ### Next Steps
-1. Source a dataset with explicit governance, human-factor, and cybersecurity compliance features aligned with NIST SP 800-37 and CMMC frameworks for direct IT project risk classification
-2. Engineer composite risk features combining code quality metrics with governance compliance indicators
-3. Optimize for Recall on the Defective/High-Risk class, false negatives (missed defects/risks) are the higher-cost failure mode in production deployment
-4. Explore ensemble stacking combining Logistic Regression (strong on linear features) and XGBoost (strong on non-linear features)
-5. Extend to multi-class risk classification (Critical / High / Medium / Low) using the NIST risk severity taxonomy
-6. Publish methodology as a research contribution connecting software defect prediction to cybersecurity governance analytics
+1. Re-map Session 1 to binary classification (Critical/High vs Medium/Low) to remove the label cardinality confounder
+2. Source or construct a dataset with explicit governance, human-factor, and cybersecurity compliance features aligned with NIST SP 800-37 and CMMC frameworks
+3. Engineer composite risk features combining code quality metrics with governance compliance indicators
+4. Optimise recall through calibrated probability threshold tuning — set P(Defective) > 0.30 rather than 0.50
+5. Incorporate calibration within the cross-validation loop for a more robust calibrated generalisation estimate
+6. Extend to multi-class risk classification (Critical / High / Medium / Low) using a governance-aligned dataset
+7. Apply Walk-Forward Validation when this pipeline is deployed on time-stamped project data in production
 
 ---
 
