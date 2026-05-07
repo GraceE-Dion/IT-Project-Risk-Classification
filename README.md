@@ -267,7 +267,7 @@ LR is inherently well-calibrated (optimises log-loss directly). XGBoost benefits
 | 9 | Previous_Delivery_Success_Rate | 0.2740 |
 | 10 | Industry_Volatility | 0.2360 |
 
-Governance and human-factor variables dominate. SHAP values are relatively evenly distributed, consistent with the synthetic dataset's near-linear, low-signal structure. High `Team_Turnover_Rate` and low `Previous_Delivery_Success_Rate` push toward Critical classification — governance-consistent directional behaviour.
+Governance and human-factor variables dominate. SHAP values are relatively evenly distributed, consistent with the synthetic dataset's near-linear, low-signal structure. High `Team_Turnover_Rate` and low `Previous_Delivery_Success_Rate` push toward Critical classification - governance-consistent directional behaviour.
 
 **Key observation:** High and Medium classes were consistently confused across all models, reflecting their adjacent risk boundaries in the synthetic dataset's generative logic, not a modeling failure.
 
@@ -554,8 +554,8 @@ jupyter notebook notebooks/02_nasa_mdp_real_data.ipynb
 
 ### Current Limitations
 
-- **Proxy nature of Session 2 data.** The NASA MDP dataset contains software code metrics only — does not include governance, human-factor, or cybersecurity compliance features directly. Defect prediction serves as a proxy for IT project risk, not a direct risk classification. SHAP analysis confirms the model responds to code volume signals (LOC_TOTAL, DESIGN_COMPLEXITY) rather than the governance indicators that NIST SP 800-37 and CMMC identify as primary risk variables.
-- **Task structure confounder.** Session 1 performs four-class classification (49 features) while Session 2 performs binary classification (21 features). Label cardinality and feature dimensionality differ between sessions — the 30.5% F1 improvement cannot be attributed solely to dataset authenticity. Future work should re-map Session 1 to binary classification to isolate the authenticity effect under identical task conditions.
+- **Proxy nature of Session 2 data.** The NASA MDP dataset contains software code metrics only; it does not include governance, human-factor, or cybersecurity compliance features directly. Defect prediction serves as a proxy for IT project risk, not a direct risk classification. SHAP analysis confirms the model responds to code volume signals (LOC_TOTAL, DESIGN_COMPLEXITY) rather than the governance indicators that NIST SP 800-37 and CMMC identify as primary risk variables.
+- **Task structure confounder.** Session 1 performs four-class classification (49 features) while Session 2 performs binary classification (21 features). Label cardinality and feature dimensionality differ between sessions, the 30.5% F1 improvement cannot be attributed solely to dataset authenticity. Future work should re-map Session 1 to binary classification to isolate the authenticity effect under identical task conditions.
 - **Minority class recall.** Defective class F1 (0.42) and 92 missed defective modules (44% miss rate) remain a deployment risk indicator. Recall optimisation through calibrated probability threshold tuning (P(Defective) > 0.30) is the immediate mitigation.
 - **SMOTE and ensemble interaction.** SMOTE augmentation introduces synthetic minority samples that interact adversely with Random Forest across all six configurations. XGBoost generalises successfully but the interaction remains a practical constraint on ensemble method selection.
 - **Temporal structure.** Both datasets are static snapshots without timestamp information. Temporal leakage is not applicable here, but any production deployment on time-stamped IT project data would require Walk-Forward Validation rather than stratified splitting.
