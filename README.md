@@ -327,7 +327,7 @@ Governance and human-factor variables dominate. SHAP values are relatively evenl
 | 9 | NUM_UNIQUE_OPERATORS | 0.0174 |
 | 10 | HALSTEAD_LEVEL | 0.0160 |
 
-Code volume and structural complexity features dominate — the direct inverse of Session 1. The profile is highly concentrated: top 3 features account for the vast majority of predictive power. High `LOC_TOTAL` pushes strongly toward Defective classification, consistent with software engineering theory that larger modules carry higher defect density.
+Code volume and structural complexity features dominate the direct inverse of Session 1. The profile is highly concentrated: top 3 features account for the vast majority of predictive power. High `LOC_TOTAL` pushes strongly toward Defective classification, consistent with software engineering theory that larger modules carry higher defect density.
 
 **Cross-session SHAP contrast (mechanistic answer to RQ2):**
 | | Session 1 (Synthetic) | Session 2 (NASA MDP) |
