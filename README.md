@@ -267,7 +267,7 @@ LR is inherently well-calibrated (optimises log-loss directly). XGBoost benefits
 | 9 | Previous_Delivery_Success_Rate | 0.2740 |
 | 10 | Industry_Volatility | 0.2360 |
 
-Governance and human-factor variables dominate. SHAP values are relatively evenly distributed, consistent with the synthetic dataset's near-linear, low-signal structure. High `Team_Turnover_Rate` and low `Previous_Delivery_Success_Rate` push toward Critical classification - governance-consistent directional behaviour.
+Governance and human-factor variables dominate. SHAP values are relatively evenly distributed, consistent with the synthetic dataset's near-linear, low-signal structure. High `Team_Turnover_Rate` and low `Previous_Delivery_Success_Rate` push toward Critical classification, governance-consistent directional behaviour.
 
 **Key observation:** High and Medium classes were consistently confused across all models, reflecting their adjacent risk boundaries in the synthetic dataset's generative logic, not a modeling failure.
 
