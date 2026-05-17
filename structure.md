@@ -1,92 +1,127 @@
 # 📂 Project File Structure
 
+# Pipeline Structure and Workflow
+
+## IT Project Risk Classification - Complete File Reference
+
+---
+
 This repository is organized into a modular pipeline covering both development sessions — from synthetic baseline through to NASA Raw MDP real-world data modeling.
 
 ---
 
-## The Complete Workflow
+## SESSION 1: Synthetic Kaggle Dataset (4,000 rows, 49 features, 4-class)
+
+| File | Stage | Key Output |
+|---|---|---|
+| `08_session1_synthetic_baseline.py` | Model comparison - LR, RF (3 configs), XGBoost (3 configs) | LR selected: Val F1=0.5890, Gap=0.0079 ✅ |
+| `09_session1_cross_validation.py` | 5-fold stratified CV | CV F1=0.5700 ± 0.0165 - synthetic ceiling |
+| `10_session1_final_evaluation.py` | Final test on locked test set | Test F1=0.5872, Accuracy=0.58 |
+| `10b_session1_probability_calibration.py` | Platt Scaling post-hoc calibration | Brier: 0.1390 → 0.1423 (no gain - LR inherently calibrated) |
+| `10c_session1_shap_explainability.py` | SHAP LinearExplainer | Top: Org_Process_Maturity (0.69), Technology_Familiarity (0.49) |
+| `11_session1_binary_recast.py` | Session 1b - binary recast experiment | CV F1=0.8101 ± 0.0095 - synthetic data deceptively easy |
+| `12_session1_statistical_tests.py` | Paired t-test, Wilcoxon, Cohen's d, 95% CIs | S1 vs S2: p=0.0000, d=12.19 (large) ✅ |
+| `13_session1_ablation_scaling.py` | LR without StandardScaler | CV delta: -0.1044; ConvergenceWarning without scaling |
+| `14_session1_roc_pr_curves.py` | ROC and PR curves (one-vs-rest) | Critical AUC=0.911, AP=0.679 |
+
+---
+
+## SESSION 2: NASA MDP JM1 Raw (10,878 rows, 21 features, binary)
+
+| File | Stage | Key Output |
+|---|---|---|
+| `11_session2_dummy_baseline.py` | Majority-class performance floor | Val F1=0.4465, Test F1=0.4466 |
+| `11b_session2_nasa_mdp_baseline.py` | LR baseline on NASA MDP | Val F1=0.6232, Gap=0.0440 ✅ |
+| `12_session2_random_forest.py` | RF tuning - 3 configurations | All overfit (gaps: 0.14, 0.10, 0.13) ❌ negative finding |
+| `14_session2_xgboost.py` | XGBoost tuning - 3 configurations | v2 borderline (0.0955); v1/v3 overfit |
+| `15_session2_cross_validation.py` | 5-fold stratified CV | CV F1=0.7439 ± 0.0074 - selected |
+| `16_session2_probability_calibration.py` | Isotonic Regression calibration | Brier: 0.1989 → 0.1406 (29.3% improvement) |
+| `17_session2_shap_explainability.py` | SHAP TreeExplainer | Top: LOC_TOTAL (0.46), LOC_BLANK (0.23) |
+| `18_session2_final_evaluation.py` | Final test on locked test set | Test F1=0.6082, Accuracy=0.70 |
+| `19_session2_roc_pr_curves.py` | ROC and PR curves (binary) | ROC AUC=0.7119, PR AUC=0.4127 (2.1x above random) |
+| `20_session2_ablation_smote.py` | XGBoost without SMOTE | CV delta: -0.1310; 1.7x less stable without SMOTE |
+| `21_session2_ablation_calibration.py` | XGBoost without calibration | Uncalibrated flags 72.6% at threshold 0.30 vs 19.9% calibrated |
+| `22_session2_mcnemar_test.py` | McNemar's test: LR vs XGBoost | p=0.1014 (not significant); c=70, b=51 |
+| `23_session2_vif_correlation.py` | VIF and correlation heatmap | 15/21 features VIF > 10; HALSTEAD_EFFORT = HALSTEAD_PROG_TIME (r=1.0000) |
+| `24_session2_error_analysis.py` | Error analysis on 92 missed modules | FN mean LOC_TOTAL=18.7 vs TP=125.8 (6.7x); threshold 0.30 recovers 66/92 |
+
+---
+
+## SHARED PIPELINE FILES
 
 | File | Stage | Description |
 |---|---|---|
-| `01_setup_environment.py` | Setup | Installs all dependencies and verifies environment |
-| `02_data_acquisition.py` | Data | Downloads synthetic dataset from Kaggle and NASA MDP JM1.arff from GitHub |
-| `03_data_inspection.py` | Data | Shape, column names, target distribution, missing values, data authenticity check |
-| `04_preprocessing.py` | Data | Missing value imputation, label encoding, byte string decoding, feature/target separation |
-| `05_feature_scaling.py` | Data | StandardScaler fit on training set; applied to validation and test sets |
-| `06_class_balancing.py` | Data | SMOTE applied to training set only; class distribution before and after |
-| `07_train_val_test_split.py` | Data | Stratified 80/10/10 split — test set locked until final evaluation |
-| `08_session1_synthetic_baseline.py` | Session 1 | Full pipeline on synthetic dataset — Logistic Regression, Random Forest, XGBoost |
-| `09_session1_cross_validation.py` | Session 1 | 5-fold stratified CV on synthetic dataset — true performance ceiling: 0.57 F1 |
-| `10_session1_final_evaluation.py` | Session 1 | Logistic Regression final test evaluation — Test F1: 0.5872 |
-| `11_session2_nasa_mdp_baseline.py` | Session 2 | Logistic Regression baseline on NASA MDP data — Val F1: 0.6232, Gap: 0.0440 |
-| `12_session2_random_forest.py` | Session 2 | Random Forest tuning — 3 configurations, all overfit (negative finding) |
-| `13_session2_xgboost.py` | Session 2 | XGBoost tuning — 3 configurations with regularization progression |
-| `14_session2_cross_validation.py` | Session 2 | 5-fold CV on NASA MDP — Mean F1: 0.7439, Std: 0.0074 (selected model) |
-| `15_session2_final_evaluation.py` | Session 2 | XGBoost final test evaluation — Test F1: 0.6082, Accuracy: 0.70 |
-| `16_dataset_comparison.py` | Analysis | Side-by-side comparison: synthetic vs NASA MDP performance metrics |
-| `master_training_script.py` | Full Pipeline | End-to-end pipeline from data acquisition to final evaluation and comparison |
-| `requirements.txt` | Setup | All dependencies for full reproduction |
+| `01_setup_environment.py` | Setup | Installs dependencies, verifies environment |
+| `02_data_acquisition.py` | Data | Downloads synthetic CSV (Kaggle) and NASA MDP ARFF (GitHub) |
+| `03_data_inspection.py` | EDA | Shape, columns, target distribution, authenticity check |
+| `04_preprocessing.py` | Preprocessing | Imputation, label encoding, byte string decoding |
+| `05_feature_scaling.py` | Scaling | StandardScaler fit on training set only (post-split) |
+| `06_class_balancing.py` | Balancing | SMOTE applied to Session 2 training set only |
+| `07_train_val_test_split.py` | Splitting | Stratified 80/10/10 split - test set locked |
+| `25_dataset_comparison.py` | Comparison | Cross-session side-by-side comparison chart |
+| `master_training_script.py` | Full pipeline | Runs complete end-to-end pipeline in one execution |
 
 ---
 
-## 🌳 Repository Tree
+## CROSS-SESSION COMPARISON SUMMARY
 
-```
-IT-Project-Risk-Classification/
-│
-├── notebooks/
-│   ├── 01_synthetic_baseline.ipynb         # Session 1 — Full Kaggle notebook
-│   └── 02_nasa_mdp_real_data.ipynb         # Session 2 — Full Kaggle notebook
-│
-├── data/
-│   ├── raw/                                # Original datasets (do not modify)
-│   │   ├── project_risk_raw_dataset.csv    # Synthetic dataset (Kaggle)
-│   │   └── JM1.arff                        # NASA MDP raw data (GitHub)
-│   └── processed/                          # Cleaned, encoded, scaled datasets
-│
-├── outputs/
-│   ├── confusion_matrix_session1.png       # Session 1 confusion matrix
-│   ├── confusion_matrix_session2.png       # Session 2 confusion matrix
-│   ├── class_distribution_session1.png     # Session 1 class distribution
-│   └── missing_values_session1.png         # Session 1 missing values chart
-│
-├── 01_setup_environment.py
-├── 02_data_acquisition.py
-├── 03_data_inspection.py
-├── 04_preprocessing.py
-├── 05_feature_scaling.py
-├── 06_class_balancing.py
-├── 07_train_val_test_split.py
-├── 08_session1_synthetic_baseline.py
-├── 09_session1_cross_validation.py
-├── 10_session1_final_evaluation.py
-├── 11_session2_nasa_mdp_baseline.py
-├── 12_session2_random_forest.py
-├── 13_session2_xgboost.py
-├── 14_session2_cross_validation.py
-├── 15_session2_final_evaluation.py
-├── 16_dataset_comparison.py
-├── master_training_script.py
-├── requirements.txt
-├── structure.md
-└── README.md
-```
+| Metric | Session 1 | Session 1b | Session 2 |
+|---|---|---|---|
+| Task | 4-class synthetic | Binary synthetic | Binary NASA MDP |
+| CV F1 | 0.5700 | 0.8101 | 0.7439 |
+| CV Std | 0.0165 | 0.0095 | 0.0074 |
+| Best model | Logistic Regression | Logistic Regression | XGBoost |
+| Test F1 | 0.5872 | 0.8220 | 0.6082 |
+| Brier (cal) | 0.1423 | - | 0.1406 |
+| Top SHAP | Org_Process_Maturity (0.69) | - | LOC_TOTAL (0.46) |
+
+**Key statistical results:**
+- S1 vs S2: t=-22.92, p=0.0000, Cohen's d=12.19 (large) ✅
+- S1b vs S2: t=+11.61, p=0.0003, Cohen's d=-6.99 (large) ✅
+- S1 vs S1b: t=-36.49, p=0.0000, Cohen's d=15.99 (large) ✅
+- Wilcoxon: p=0.0625 all (expected - n=5 too small for p<0.05)
 
 ---
 
-## 🚀 Production and Documentation
+## OUTPUTS REFERENCE
 
-**`master_training_script.py`**
-The full end-to-end pipeline. Run this file to replicate the entire two-session development from data acquisition to final evaluation and dataset comparison in one execution.
+| File | Generated by | Description |
+|---|---|---|
+| `confusion_matrix_session1_pub.png` | 10_session1_final_evaluation | Session 1 confusion matrix |
+| `classification_report_session1_pub.png` | 10_session1_final_evaluation | Session 1 per-class F1 chart |
+| `calibration_curves_session1.png` | 10b_session1_probability_calibration | Session 1 Platt Scaling curves |
+| `shap_importance_session1.png` | 10c_session1_shap_explainability | Session 1 SHAP bar chart |
+| `shap_beeswarm_session1.png` | 10c_session1_shap_explainability | Session 1 SHAP beeswarm |
+| `confusion_matrix_session1b_binary.png` | 11_session1_binary_recast | Session 1b binary confusion matrix |
+| `roc_curves_session1.png` | 14_session1_roc_pr_curves | Session 1 ROC one-vs-rest |
+| `pr_curves_session1.png` | 14_session1_roc_pr_curves | Session 1 PR one-vs-rest |
+| `confusion_matrix_session2_pub.png` | 18_session2_final_evaluation | Session 2 confusion matrix |
+| `classification_report_session2_pub.png` | 18_session2_final_evaluation | Session 2 per-class F1 chart |
+| `calibration_curve_session2.png` | 16_session2_probability_calibration | Session 2 Isotonic Regression curve |
+| `shap_importance_session2.png` | 17_session2_shap_explainability | Session 2 SHAP bar chart |
+| `shap_beeswarm_session2.png` | 17_session2_shap_explainability | Session 2 SHAP beeswarm |
+| `roc_curve_session2.png` | 19_session2_roc_pr_curves | Session 2 ROC curve |
+| `pr_curve_session2.png` | 19_session2_roc_pr_curves | Session 2 PR curve |
+| `correlation_heatmap_session2.png` | 23_session2_vif_correlation | NASA MDP correlation heatmap |
+| `error_analysis_session2.png` | 24_session2_error_analysis | FN probability distribution plot |
 
-**`requirements.txt`**
-Install all dependencies with:
-```bash
-pip install -r requirements.txt
-```
+---
 
-**`notebooks/`**
-Both Kaggle notebooks are included for full reproducibility. Each notebook mirrors its corresponding `.py` files and can be run independently on Kaggle's free CPU environment. No GPU required.
+## REPRODUCIBILITY
 
-**`README.md`**
-The main project report covering both development sessions, overfitting prevention protocol, performance metrics, dataset comparison, and AI governance principles.
+All experiments use `random_state=42` throughout. Platform: Kaggle free-tier CPU (Intel Xeon, 2 vCPUs, 13 GB RAM). No GPU required.
+
+| Library | Version |
+|---|---|
+| Python | 3.10+ |
+| scikit-learn | 1.3+ |
+| xgboost | 1.7+ |
+| imbalanced-learn | 0.11+ |
+| shap | 0.42+ |
+| statsmodels | 0.14+ |
+| pandas | 2.0+ |
+| numpy | 1.24+ |
+| scipy | 1.10+ |
+| matplotlib | 3.7+ |
+| seaborn | 0.12+ |
+
