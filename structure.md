@@ -6,7 +6,7 @@
 
 ---
 
-This repository is organized into a modular pipeline covering both development sessions — from synthetic baseline through to NASA Raw MDP real-world data modeling.
+This repository is organized into a modular pipeline covering both development sessions, from synthetic baseline through to NASA Raw MDP real-world data modeling.
 
 ---
 
