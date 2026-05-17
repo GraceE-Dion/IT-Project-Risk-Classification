@@ -484,7 +484,7 @@ McNemar's exact test: p=0.1014 (not significant at p<0.05). XGBoost corrects 70 
 
 ### Session 1b - Binary Recast
 <p align="center">
-  <img src="images/confusion_matrix_session1b_binary.jpg" width="55%" />
+  <img src="images/confusion_matrix_session1b_binary.jpg" width="75%" />
 </p>
 
 <hr>
