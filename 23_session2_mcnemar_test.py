@@ -1,5 +1,5 @@
 """
-22_session2_mcnemar_test.py
+23_session2_mcnemar_test.py
 ============================
 Session 2 - McNemar's Test: Logistic Regression vs XGBoost
 Dataset: NASA Metrics Data Program (MDP) JM1 test set (1,088 samples)
