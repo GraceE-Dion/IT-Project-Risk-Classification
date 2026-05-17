@@ -1,5 +1,5 @@
 """
-23_session2_vif_correlation.py
+24_session2_vif_correlation.py
 ================================
 Session 2 - Feature Correlation and VIF Analysis
 Dataset: NASA Metrics Data Program (MDP) JM1 (10,878 rows, 21 features)
